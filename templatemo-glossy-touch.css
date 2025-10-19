@@ -851,6 +851,33 @@ button[type="submit"] {
     transition: background 0.3s ease;
   }
 
+/* Scroll animation helpers - used by JS IntersectionObserver */
+.animate-on-scroll {
+    opacity: 0;
+    transform: translateY(20px);
+    /* slower transition for gentler motion */
+    transition: opacity 1.1s cubic-bezier(0.22, 0.9, 0.36, 1), transform 1.1s cubic-bezier(0.22, 0.9, 0.36, 1);
+    will-change: opacity, transform;
+}
+.animate-on-scroll.is-visible {
+    opacity: 1;
+    transform: translateY(0);
+}
+
+/* If animate.css is available, JS will also add animate__animated and an animate__* class for more dramatic effects */
+
+/* Simple fade-in on scroll (no translate) */
+.fade-in-on-scroll {
+    opacity: 0;
+    transform: none;
+    /* slower fade for a calmer entrance */
+    transition: opacity 1s cubic-bezier(0.22, 0.9, 0.36, 1);
+    will-change: opacity;
+}
+.fade-in-on-scroll.is-visible {
+    opacity: 1;
+}
+
   .whatsapp-btn:hover {
     background-color: #1ebe57;
   }

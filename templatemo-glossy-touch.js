@@ -132,37 +132,42 @@ let currentPage = 'home';
         `;
         document.head.appendChild(style);
 
-        // Form submission handling
-        document.querySelector('form').addEventListener('submit', function(e) {
-            e.preventDefault();
-            
-            // Create success message
-            const successMsg = document.createElement('div');
-            successMsg.style.cssText = `
-                position: fixed;
-                top: 50%;
-                left: 50%;
-                transform: translate(-50%, -50%);
-                background: rgba(46, 204, 113, 0.9);
-                color: white;
-                padding: 20px 40px;
-                border-radius: 10px;
-                backdrop-filter: blur(20px);
-                z-index: 10000;
-                animation: fadeIn 0.3s ease;
-            `;
-            successMsg.textContent = 'Message sent successfully! We\'ll get back to you soon.';
-            
-            document.body.appendChild(successMsg);
-            
-            // Remove message after 3 seconds
-            setTimeout(() => {
-                successMsg.remove();
-            }, 3000);
-            
-            // Reset form
-            this.reset();
-        });
+        // Form submission handling (guarded)
+        (function() {
+            const form = document.querySelector('form');
+            if (!form) return; // no form on this page
+
+            form.addEventListener('submit', function(e) {
+                e.preventDefault();
+
+                // Create success message
+                const successMsg = document.createElement('div');
+                successMsg.style.cssText = `
+                    position: fixed;
+                    top: 50%;
+                    left: 50%;
+                    transform: translate(-50%, -50%);
+                    background: rgba(46, 204, 113, 0.9);
+                    color: white;
+                    padding: 20px 40px;
+                    border-radius: 10px;
+                    backdrop-filter: blur(20px);
+                    z-index: 10000;
+                    animation: fadeIn 0.3s ease;
+                `;
+                successMsg.textContent = 'Message sent successfully! We\'ll get back to you soon.';
+
+                document.body.appendChild(successMsg);
+
+                // Remove message after 3 seconds
+                setTimeout(() => {
+                    successMsg.remove();
+                }, 3000);
+
+                // Reset form
+                this.reset();
+            });
+        })();
 
         // Add fade in animation
         const fadeStyle = document.createElement('style');
@@ -173,3 +178,70 @@ let currentPage = 'home';
             }
         `;
         document.head.appendChild(fadeStyle);
+
+        // Scroll animations using IntersectionObserver (simple fade-in)
+        (function() {
+            const prefersReducedMotion = window.matchMedia('(prefers-reduced-motion: reduce)').matches;
+
+            function handleIntersect(entries, observer) {
+                entries.forEach(entry => {
+                    const el = entry.target;
+                    if (entry.isIntersecting) {
+                        el.classList.add('is-visible');
+                        observer.unobserve(el);
+                    }
+                });
+            }
+
+            function initScrollAnimations() {
+                // Choose which elements should use a plain fade-in vs a translate+fade
+                const fadeEls = document.querySelectorAll('section, .about-text, .service-card, .feature-card');
+                fadeEls.forEach(el => el.classList.add('fade-in-on-scroll'));
+
+                const translateEls = document.querySelectorAll('.skill-card, .contact-item, .footer-content');
+                translateEls.forEach(el => el.classList.add('animate-on-scroll'));
+
+                if (prefersReducedMotion) {
+                    // If user prefers reduced motion, just reveal immediately without animation
+                    document.querySelectorAll('.fade-in-on-scroll, .animate-on-scroll').forEach(el => el.classList.add('is-visible'));
+                    return;
+                }
+
+                // Apply small staggered delays for grid items to create a cascade effect
+                const stagger = (nodes, step = 80) => {
+                    nodes.forEach((el, i) => {
+                        // Only set delay if not already set; use ms
+                        el.style.transitionDelay = `${i * step}ms`;
+                        // also set animationDelay in case animate.css is used elsewhere
+                        el.style.animationDelay = `${i * step}ms`;
+                    });
+                };
+
+                // Stagger feature cards and service cards within their containers
+                const featureCards = document.querySelectorAll('.feature-card');
+                const serviceCards = document.querySelectorAll('.service-card');
+                const skillCards = document.querySelectorAll('.skill-card');
+
+                // Longer delays for a slower, gentler cascade
+                stagger(featureCards, 140);
+                stagger(serviceCards, 160);
+                stagger(skillCards, 130);
+
+                const observer = new IntersectionObserver(handleIntersect, {
+                    root: null,
+                    rootMargin: '0px 0px -12% 0px',
+                    threshold: 0.12
+                });
+
+                const nodes = document.querySelectorAll('.fade-in-on-scroll, .animate-on-scroll');
+                console.debug('[scroll-anim] initializing, nodes to observe:', nodes.length);
+                nodes.forEach(el => observer.observe(el));
+            }
+
+            // Run init immediately if DOM is already ready, otherwise wait for DOMContentLoaded
+            if (document.readyState === 'loading') {
+                document.addEventListener('DOMContentLoaded', initScrollAnimations);
+            } else {
+                initScrollAnimations();
+            }
+        })();
