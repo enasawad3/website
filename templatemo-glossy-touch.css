@@ -172,9 +172,14 @@ nav {
 .nav-links {
     display: flex;
     gap: 30px;
+    /* desktop: no background so nav blends with header */
+    background: transparent;
+    padding: 0;
+    border-radius: 0;
+    height: fit-content;
 }
 .nav-links a {
-    color: rgba(255, 255, 255, 0.9);
+    color: #ffffff;
     text-decoration: none;
     font-weight: 500;
     transition: all 0.3s ease;
@@ -182,13 +187,31 @@ nav {
     border-radius: 10px;
     cursor: pointer;
     font-size: 16px;
-	border-bottom: 1px solid rgba(255, 255, 255, 0.6);
+    border-bottom: 1px solid rgba(255, 255, 255, 0.6);
 }
 .nav-links a:hover,
 .nav-links a.active {
     color: white;
     background: rgba(255, 255, 255, 0.1);
     text-shadow: 0 0 10px rgba(255, 255, 255, 0.5);
+}
+
+/* Mobile hamburger button (hidden on desktop) */
+.mobile-menu-btn {
+    display: none;
+    background: none;
+    border: none;
+    cursor: pointer;
+    padding: 8px;
+    z-index: 1100;
+}
+.mobile-menu-btn span {
+    display: block;
+    width: 26px;
+    height: 3px;
+    background-color: white;
+    margin: 4px 0;
+    transition: all 0.25s ease;
 }
 /* Page system */
 .page {
@@ -203,6 +226,7 @@ nav {
 .content-wrapper {
     min-height: calc(100vh - 300px);
 }
+/* ...existing code... */
 /* Home page styles */
 .hero {
     display: grid;
@@ -677,23 +701,62 @@ button[type="submit"] {
         font-size: 2.5rem;
     }
     nav {
-        flex-direction: column;
-        gap: 20px;
-        padding: 20px 30px;
-    }
-    .nav-links {
-        gap: 15px;
-        justify-content: center;
-        flex-direction: column;
+        flex-direction: row;
+        justify-content: space-between;
         align-items: center;
+        padding: 12px 20px;
+        position: relative;
+    }
+    .mobile-menu-btn {
+        display: block;
+    }
+    /* full-screen overlay mobile nav */
+    .nav-links {
+        position: fixed;
+        top: 0;
+        left: 0;
+        right: 0;
+        bottom: 0;
+        background: rgba(0,0,0,0.95);
+        display: flex;
+        flex-direction: column;
+        justify-content: center;
+        align-items: center;
+        gap: 20px;
+        padding: 40px 20px;
+        transform: translateY(-100%);
+        opacity: 0;
+        visibility: hidden;
+        transition: transform 0.35s ease, opacity 0.25s ease;
+        z-index: 2000;
+    }
+    .nav-links.show {
+        transform: translateY(0);
+        opacity: 1;
+        visibility: visible;
     }
     .nav-links a {
         display: block;
         text-align: center;
         width: 100%;
-        max-width: 200px;
-        font-size: 14px;
-        padding: 10px 20px;
+        max-width: 360px;
+        font-size: 20px;
+        padding: 12px 20px;
+        background: transparent;
+        border-radius: 8px;
+        border-bottom: none;
+    }
+    .nav-close-btn {
+        position: absolute;
+        top: 18px;
+        right: 18px;
+        background: transparent;
+        color: white;
+        border: none;
+        font-size: 28px;
+        cursor: pointer;
+        z-index: 2100;
+        padding: 6px 10px;
     }
     .about-content,
     .contact-grid {
@@ -727,6 +790,15 @@ button[type="submit"] {
     .logo {
         font-size: 22px;
     }
+    /* show close button only on mobile overlays */
+    .nav-close-btn {
+        display: block;
+    }
+}
+
+/* hide close button on larger screens */
+.nav-close-btn {
+    display: none;
 }
    #skills {
     text-align: center;

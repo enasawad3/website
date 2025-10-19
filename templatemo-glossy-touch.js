@@ -57,6 +57,8 @@ let currentPage = 'home';
             parallax.style.transform = `translateY(${speed}px)`;
         });
 
+        // ...existing code...
+
         // Add click ripple effect to glass elements
         document.querySelectorAll('.glass').forEach(element => {
             element.addEventListener('click', function(e) {
@@ -88,6 +90,35 @@ let currentPage = 'home';
                 }, 600);
             });
         });
+
+        // Mobile menu toggle
+        function toggleMobileMenu() {
+            const btn = document.querySelector('.mobile-menu-btn');
+            const nav = document.querySelector('.nav-links');
+            if (!btn || !nav) return;
+            btn.classList.toggle('active');
+            nav.classList.toggle('show');
+        }
+
+        // Close mobile menu when a nav link is clicked
+        document.querySelectorAll('.nav-links a').forEach(a => {
+            a.addEventListener('click', () => {
+                const nav = document.querySelector('.nav-links');
+                const btn = document.querySelector('.mobile-menu-btn');
+                if (nav && nav.classList.contains('show')) {
+                    nav.classList.remove('show');
+                }
+                if (btn && btn.classList.contains('active')) btn.classList.remove('active');
+            });
+        });
+
+        // Close mobile menu (for the explicit close button)
+        function closeMobileMenu() {
+            const nav = document.querySelector('.nav-links');
+            const btn = document.querySelector('.mobile-menu-btn');
+            if (nav && nav.classList.contains('show')) nav.classList.remove('show');
+            if (btn && btn.classList.contains('active')) btn.classList.remove('active');
+        }
 
         // Add ripple animation keyframes
         const style = document.createElement('style');
